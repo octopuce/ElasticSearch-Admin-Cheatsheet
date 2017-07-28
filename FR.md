@@ -8,9 +8,9 @@ Elasticsearch est un serveur d'indexation et de recherche sur de grands ensemble
 * L'interface HTTP REST est utilisée pour s'adresser au serveur, pour les requêtes comme pour l'administration.
 * Le format JSON en entrée/sortie rend ES compatible avec tous les langages de programmation.
 
-### Le fonctionnement par cluster
+### La clusterisation
 
-Un cluster ES est constitué de plusieurs instances, dont chacune devient un **node** du **cluster** ES. Pour autant, il est possible de faire tourner un cluster ES avec un seul node.
+Un **cluster** ES est constitué de plusieurs instances, dont chacune est appelée un noeud / **node**. Pour autant, il est possible de faire tourner un cluster ES avec un seul node.
 
 Le Cluster se constitue dynamiquement, chaque node recherchant un cluster à rejoindre. Multicast est utilisé par défaut par les nodes pour trouver les membres de leur cluster. Mais il est possible pointer des adresses de serveurs individuellement en unicast.
 
