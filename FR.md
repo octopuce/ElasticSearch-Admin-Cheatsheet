@@ -47,14 +47,15 @@ Par défault, les nodes écoutent sur deux ports, configurables:
 
 ### Fonctionnement par API 
 
-L'API ES est RESTful : elle utilise les méthodes HTTP GET, POST, PUT, DELETE, etc. pour passer des requêtes au cluster et lire / créer / remplacer / détruire / etc. des ressources.  
+L'API ES est RESTful : elle utilise les méthodes HTTP GET, POST, PUT, DELETE, etc. pour passer des requêtes au cluster et lire / créer / remplacer / détruire / etc. des ressources. 
+
 Par défaut, les requêtes sont gérées par le cluster dans son ensemble, quelque soit le noeud du cluster sur lequel on émet la requête.
 
 #### Reprendre les exemples de la doc 
 
 La documentation d'ES donne des exemples en éludant le protocole, l'adresse, et les arguments de CURL. Ainsi 
 
-    PUT /_cluster/settings {
+    **PUT /_cluster/settings** {
       "transient": {
           "cluster.routing.allocation.exclude._name": "myhost"
       }
@@ -62,7 +63,7 @@ La documentation d'ES donne des exemples en éludant le protocole, l'adresse, et
 
 peut être exécuté comme ceci :
 
-    curl -XPUT http://localhost:9200/_cluster/settings?pretty -d '{
+    curl -X**PUT** http://localhost:9200/**_cluster/settings**?pretty -d '{
       "transient": {
           "cluster.routing.allocation.exclude._name": "myhost"
       }
