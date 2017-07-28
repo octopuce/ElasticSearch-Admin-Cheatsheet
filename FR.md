@@ -3,15 +3,21 @@
 ## ES, c'est quoi, comment ça marche ? 
 
 Elasticsearch est un serveur d'indexation et de recherche sur de grands ensembles de données, qui utilise la plateforme JAVA et la librairie Lucene. 
+
 La clusterisation est native: un canal privilégié permet aux machines d'échanger entre elles.
+
 L'interface HTTP REST est utilisée pour s'adresser au serveur, pour les requêtes comme pour l'administration.
+
 Le format JSON en entrée/sortie rend ES compatible avec tous les langages de programmation.
 
 ### Le fonctionnement par cluster
 
 Un cluster ES est constitué de plusieurs instances, dont chacune devient un "node" du cluster.
+
 Pour autant, il est possible de faire tourner un cluster ES avec un seul node.
+
 Le Cluster se constitue dynamiquement, chaque node recherchant un cluster à rejoindre. 
+
 Multicast est utilisé par défaut par les nodes pour trouver les membres de leur cluster. Mais il est possible pointer des adresses de serveurs individuellement en unicast.
 
 ### Réseau et sécurité du cluster
