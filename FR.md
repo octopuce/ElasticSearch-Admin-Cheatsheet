@@ -2,7 +2,7 @@
 
 ## ES, c'est quoi, comment ça marche ? 
 
-Elasticsearch est un serveur d'indexation et de recherche sur de grands ensembles de données, qui utilise la plateforme JAVA et la librairie Lucene. 
+Elasticsearch est un serveur d'indexation et de recherche sur de grands ensembles de données, qui utilise la plateforme JAVA et la librairie Lucene pour indexer et chercher dans du texte. 
 
 * La clusterisation est native: un canal privilégié permet aux machines d'échanger entre elles.
 * L'interface HTTP REST est utilisée pour s'adresser au serveur, pour les requêtes comme pour l'administration.
@@ -10,7 +10,7 @@ Elasticsearch est un serveur d'indexation et de recherche sur de grands ensemble
 
 ### Le fonctionnement par cluster
 
-Un cluster ES est constitué de plusieurs instances, dont chacune devient un "node" du cluster. Pour autant, il est possible de faire tourner un cluster ES avec un seul node.
+Un cluster ES est constitué de plusieurs instances, dont chacune devient un **node** du **cluster** ES. Pour autant, il est possible de faire tourner un cluster ES avec un seul node.
 
 Le Cluster se constitue dynamiquement, chaque node recherchant un cluster à rejoindre. Multicast est utilisé par défaut par les nodes pour trouver les membres de leur cluster. Mais il est possible pointer des adresses de serveurs individuellement en unicast.
 
@@ -32,6 +32,7 @@ Un cluster ES fonctionne avec des nodes ayant un ou plusieurs rôles :
 * Client/Ingest : le node reçoit et traite (tranforme) les requêtes utilisateurs 
 
 ### Etablissement du quorum
+
 Un cluster ES constitué d'un seul node a tous les rôles : en cas de coupure, il est sa propre référence de données.
 
 En cas de perte du master courant, les masters potentiels en élisent un nouveau. En cas de conflit, le groupe de masters le plus nombreux remporte l'élection. À 2 contre 1, impossible de tomber sur un score nul. 
@@ -41,6 +42,7 @@ Pour un cluster ES plus complexe, il est conseillé d'avoir trois serveurs avec 
 Pour les clusters intensifs, il est conseillé d'avoir des masters dédiés : n'hébergeant ni données, ne recevant pas de requêtes, ils sont plus efficaces. 
 
 ### Les ports des nodes
+
 Par défault, les nodes écoutent sur deux ports, configurables:  
 * 9200 : port d'adressage des requêtes HTTP REST
 * 9300 : port d'intercommunication entre machines du cluster
@@ -55,7 +57,7 @@ Par défaut, les requêtes sont gérées par le cluster dans son ensemble, quelq
 
 La documentation d'ES donne des exemples en éludant le protocole, l'adresse, et les arguments de CURL. Ainsi 
 
-    **PUT /_cluster/settings** {
+    PUT /_cluster/settings {
       "transient": {
           "cluster.routing.allocation.exclude._name": "myhost"
       }
@@ -63,7 +65,7 @@ La documentation d'ES donne des exemples en éludant le protocole, l'adresse, et
 
 peut être exécuté comme ceci :
 
-    curl -X**PUT** http://localhost:9200/**_cluster/settings**?pretty -d '{
+    curl -XPUT http://localhost:9200/_cluster/settings?pretty -d '{
       "transient": {
           "cluster.routing.allocation.exclude._name": "myhost"
       }
@@ -71,17 +73,23 @@ peut être exécuté comme ceci :
 
 ## La Réplication 
 La répartition des données entre nodes dans un cluster ES dérive de la manière dont sont construites ces données. 
-L'index (indice) est l'unité logique définie et utilisée par l'humain, c'est une collection de documents indexées interrogeable.
+
+
+L'**index** (indice) est l'unité logique définie et utilisée par l'humain, c'est une collection de documents indexées interrogeable.
 Un index est constitués de N éclats (shards), définis à la création de l'index.
-Un shard est l'unité de stockage atomique, éventuellement répliquée.
+
+Un **shard** est l'unité de stockage atomique, éventuellement répliquée.
 0, 1 ou plusieurs replica (répliques) d'un shard primaire (primary) sont possibles
 En cas de perte du primary shard, un réplica shard est promu comme nouvel éclat primaire. 
 
 ## Plugins
 Des plugins web sont disponibles pour ES, en particulier pour afficher l'état du cluster et mieux l'administrer.
 C'est particulièrement utile pour visualiser l'état du cluster ou la répartition des index et des shards.
+
 On utilise l'exécutable $ES_HOME/bin/plugin pour ajouter des plugins à une instance. 
+
 Le plugin est ensuite disponible sur le port 9200 du node, ex: http://localhost:9200/plugin/=plugin_name=. 
+
 Quelques plugins utiles pour administrer son cluster :
 * head
 * sense
@@ -93,29 +101,38 @@ Quelques plugins utiles pour administrer son cluster :
 
 ### Generalités
 Le fichier de configuration principal est `/etc/elasticsearch/elasticsearch.yml`
+
 La configuration est modifiable via l'API pour la partie Cluster :
 * `transient` : le changement de configuration est annulé au redémarrage du cluster
 * `persistent` : le changement de configuration est permanent
-ATTENTION, les changements "persistent" sont prioritaires par rapport aux fichiers de configuration. 
+
+**ATTENTION, les changements "persistent" sont prioritaires par rapport aux fichiers de configuration ! **
+
 Parmi les nombreux paramètres :  
 * `node_name` : détermine le nom du node dans le cluster
 * `bind_host` : détermine l'adresse IP sur laquelle écouteront les ports 9200 et 9300
 
 ### Logs
 Le fichier de configuration `/etc/elasticsearch/logging.yml` contient les emplacements, filtres et durée de vie (rotation) des logs
-Pour activer le log des requêtes, il faut le préciser dans `elasticsearch.yml`
+
+Pour activer le log des requêtes lentes, il faut le préciser dans `elasticsearch.yml`
 
 ### Backups
+
 Comme pour tout stockage de données, il est nécessaire de penser à la mise en place de backups et au test régulier de leur restoration.
+
 Les backups ES sont réalisés sur toutes les machines du cluster, il faut donc utiliser un montage de fichier réseau. 
-La définition des points de montage pour ce partage réseau est dans `elasticsearch.yml`. Pour un montage local à la NFS:
+
+La définition des **repo** (points de montage) pour ce partage réseau est dans `elasticsearch.yml`. Pour un montage local à la NFS:
 `path.repo: ["/mount/backups", "/mount/longterm_backups"]`
-Pour lancer des backups et les restauration, on utilise l'API (voir plus loin.
+
+Pour lancer des backups et les restauration, on utilise l'API (voir plus loin).
 
 ### Garbage Collector
 
 Le garbage collector de la machine java sous-jacente est responsable de la purge des adresses mémoire inutilisées. 
-Pour modifier les paramètres de la machine JAVA ES :
+
+Il est conseillé de modifier les paramètres par défaut de la machine JAVA ES :
 * copier le fichier `/usr/share/elasticsearch/bin/elasticsearch.in.sh` en `/usr/local/share/elasticsearch.elasticsearch.in.sh`
 * trouver les options `-XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly`
 * les remplacer par `-XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=35`
@@ -140,13 +157,9 @@ On utilise ici essentiellement les API CAT, Cluster, Indices
 
 Cette commande affiche en particulier les informations suivantes :
 * status : l'état du cluster
-
     * green : tous les shards sont accessibles
-
     * yellow : tous les shards primaires sont accessibles, mais il manque des répliques
-
     * red : tout ou partie des shards primaires sont inaccessibles
-
 * active_primary_shards : le nombre de shards primaires actifs
 * active_shards : le nombre total de shards actifs, y compris les répliques
 * relocating_shards : le nombre de shards en cours de déplacement
@@ -280,15 +293,45 @@ Utile pour décommissionner un nœud sans perte de redondance.
   
 ## Gestion de l'activité 
 
+### Afficher le tâches en attente
+
     curl 'http://localhost:9200/_cat/pending_tasks?v'
 
   
-## Gestion des plugins
+## Gestion des Plugins
 
 ### Lister les plugins  
 
     curl 'http://localhost:9200/_cat/plugins?v'
 
+
+## Gestion des backups
+
+### Initialiser un espace de stockage 
+
+	curl -XPUT 'http://localhost:9200/_snapshot/my_backup' -d '{
+		"type": "fs",
+		"settings": {
+			"location": "/mount/backups/my_backup",
+			"compress": true
+		}
+	}'
+
+### Lancer un backup 
+
+    curl -XPUT 'http://localhost:9200/_snapshot/my_backup/snapshot_1?wait_for_completion=true'
+
+### Afficher les backups d'un espace de stockage
+
+    curl 'http://localhost:9200/_snapshot/my_backup/_all'
+
+### Restaurer un backup
+
+    curl -XPOST 'http://localhost:9200/_snapshot/my_backup/snapshot_1/_restore'
+    
+### Supprimer un backup
+
+    curl -XDELETE 'http://localhost:9200/_snapshot/my_backup'
 
 ## Sources
 
