@@ -4,28 +4,28 @@
 
 Elasticsearch est un serveur d'indexation et de recherche sur de grands ensembles de données, qui utilise la plateforme JAVA et la librairie Lucene. 
 
-La clusterisation est native: un canal privilégié permet aux machines d'échanger entre elles.
-
-L'interface HTTP REST est utilisée pour s'adresser au serveur, pour les requêtes comme pour l'administration.
-
-Le format JSON en entrée/sortie rend ES compatible avec tous les langages de programmation.
+* La clusterisation est native: un canal privilégié permet aux machines d'échanger entre elles.
+* L'interface HTTP REST est utilisée pour s'adresser au serveur, pour les requêtes comme pour l'administration.
+* Le format JSON en entrée/sortie rend ES compatible avec tous les langages de programmation.
 
 ### Le fonctionnement par cluster
 
-Un cluster ES est constitué de plusieurs instances, dont chacune devient un "node" du cluster.
+Un cluster ES est constitué de plusieurs instances, dont chacune devient un "node" du cluster. Pour autant, il est possible de faire tourner un cluster ES avec un seul node.
 
-Pour autant, il est possible de faire tourner un cluster ES avec un seul node.
-
-Le Cluster se constitue dynamiquement, chaque node recherchant un cluster à rejoindre. 
-
-Multicast est utilisé par défaut par les nodes pour trouver les membres de leur cluster. Mais il est possible pointer des adresses de serveurs individuellement en unicast.
+Le Cluster se constitue dynamiquement, chaque node recherchant un cluster à rejoindre. Multicast est utilisé par défaut par les nodes pour trouver les membres de leur cluster. Mais il est possible pointer des adresses de serveurs individuellement en unicast.
 
 ### Réseau et sécurité du cluster
-Par défaut, ES est ouvert au niveau réseau sans couche d'authentification. Acceptable pour un cluster LAN/VLAN, c'est dangereux si les nodes ont des IP publiques.
-Les adresses IP des nodes sont configurables séparéement pour l'écoute du service (ex: 127.0.0.1, 0.0.0.0, 10.1.1.43) et pour l'intercommunication entre serveurs.
+
+Par défaut, ES est ouvert au niveau réseau sans couche d'authentification. 
+
+Si c'est acceptable pour un cluster dans un LAN/VLAN, c'est dangereux si les nodes ont des IP publiques.
+
+Les adresses IP des nodes sont configurables séparément pour l'écoute du service (ex: 127.0.0.1, 0.0.0.0, 10.1.1.43) et pour l'intercommunication entre serveurs.
+
 Configurer les adresses au plus juste et utiliser un firewall pour restreindre les accés sont de bonnes pratiques.
 
 ### Les rôles dans le cluster
+
 Un cluster ES fonctionne avec des nodes ayant un ou plusieurs rôles : 
 * Master : le node participe à l'élection (quorum) du node Master, qui décide de la validité des données et des nodes dans le cluster.
 * Data : le node stocke localement des données du cluster
@@ -33,14 +33,17 @@ Un cluster ES fonctionne avec des nodes ayant un ou plusieurs rôles :
 
 ### Etablissement du quorum
 Un cluster ES constitué d'un seul node a tous les rôles : en cas de coupure, il est sa propre référence de données.
+
 En cas de perte du master courant, les masters potentiels en élisent un nouveau. En cas de conflit, le groupe de masters le plus nombreux remporte l'élection. À 2 contre 1, impossible de tomber sur un score nul. 
+
 Pour un cluster ES plus complexe, il est conseillé d'avoir trois serveurs avec le rôle Master pour éviter un effet de "Split Brain" en cas de perte d'une partie du cluster. 
+
 Pour les clusters intensifs, il est conseillé d'avoir des masters dédiés : n'hébergeant ni données, ne recevant pas de requêtes, ils sont plus efficaces. 
 
 ### Les ports des nodes
 Par défault, les nodes écoutent sur deux ports, configurables:  
-9200 : port d'adressage des requêtes HTTP REST
-9300 : port d'intercommunication entre machines du cluster
+* 9200 : port d'adressage des requêtes HTTP REST
+* 9300 : port d'intercommunication entre machines du cluster
 
 ### Fonctionnement par API 
 
