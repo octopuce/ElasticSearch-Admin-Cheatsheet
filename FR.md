@@ -96,6 +96,7 @@ Quelques plugins utiles pour administrer son cluster :
 * elastiqsearch-hq
 * cerebro
 * bigdesk
+* elasticsearch-paramedic
 
 ## Configurer ElasticSearch
 
