@@ -86,6 +86,7 @@ En cas de perte du primary shard, un réplica shard est promu comme nouvel écla
 Des plugins web sont disponibles pour ES, en particulier pour afficher l'état du cluster et mieux l'administrer.
 C'est particulièrement utile pour visualiser l'état du cluster ou la répartition des index et des shards.
 
+**Version <5**
 On utilise l'exécutable $ES_HOME/bin/plugin pour ajouter des plugins à une instance. 
 
 Le plugin est ensuite disponible sur le port 9200 du node, ex: http://localhost:9200/plugin/=plugin_name=. 
@@ -129,15 +130,32 @@ La définition des **repo** (points de montage) pour ce partage réseau est dans
 
 Pour lancer des backups et les restauration, on utilise l'API (voir plus loin).
 
-### Garbage Collector
+### Réglages de la JVM: Heap & Garbage Collector
 
-Le garbage collector de la machine java sous-jacente est responsable de la purge des adresses mémoire inutilisées. 
+Il est conseillé de modifier les paramètres par défaut de la machine JAVA ES:
 
-Il est conseillé de modifier les paramètres par défaut de la machine JAVA ES :
+* Le "heap size" correspond à l'espace mémoire alloué à la JVM. Entre 50% de la RAM totale et 32Go au maximum.
+* Le garbage collector de la machine java sous-jacente est responsable de la purge des adresses mémoire inutilisées
+
+On part ici sur une allocation de RAM à 10G.
+
+**Option 1 : Dans default/elasticsearch**
+
+(Version < 5) Définir la taille du heap: `ES_HEAP_SIZE=10g`
+
+On peut aussi y définir les variables de la JVM
+
+ES_JAVA_OPTS="-Xms10g -Xmx10g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=35"
+
+**Option 2a : elasticsearch.in.sh (Version < 5)**
+
 * copier le fichier `/usr/share/elasticsearch/bin/elasticsearch.in.sh` en `/usr/local/share/elasticsearch.elasticsearch.in.sh`
 * trouver les options `-XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly`
 * les remplacer par `-XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=35`
 
+**Option 2b : jvm.options (Version > 5)**
+
+* Modifier les mêmes paramètres /etc/elasticsearch/jvm.options
 
 # Commandes utiles pour administrer un cluster ElasticSearch
 
