@@ -328,7 +328,7 @@ Utile pour décommissionner un nœud sans perte de redondance.
 
 ### Initialiser un espace de stockage 
 
-	curl -XPUT 'http://localhost:9200/_snapshot/my_backup' -d '{
+	curl -XPUT 'http://localhost:9200/_snapshot/es_backups' -d '{
 		"type": "fs",
 		"settings": {
 			"location": "/mount/backups/my_backup",
@@ -338,19 +338,19 @@ Utile pour décommissionner un nœud sans perte de redondance.
 
 ### Lancer un backup 
 
-    curl -XPUT 'http://localhost:9200/_snapshot/my_backup/snapshot_1?wait_for_completion=true'
+    curl -XPUT 'http://localhost:9200/_snapshot/es_backups/snapshot_1?wait_for_completion=true'
 
 ### Afficher les backups d'un espace de stockage
 
-    curl 'http://localhost:9200/_snapshot/my_backup/_all'
+    curl 'http://localhost:9200/_snapshot/es_backups/_all'
 
 ### Restaurer un backup
 
-    curl -XPOST 'http://localhost:9200/_snapshot/my_backup/snapshot_1/_restore'
+    curl -XPOST 'http://localhost:9200/_snapshot/es_backups/snapshot_name/_restore'
     
 ### Supprimer un backup
 
-    curl -XDELETE 'http://localhost:9200/_snapshot/my_backup'
+    curl -XDELETE 'http://localhost:9200/_snapshot/es_backups/snapshot_name'
 
 ## Sources
 
